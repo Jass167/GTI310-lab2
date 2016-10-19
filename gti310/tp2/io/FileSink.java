@@ -1,3 +1,4 @@
+
 package gti310.tp2.io;
 
 import java.io.BufferedOutputStream;
@@ -8,7 +9,7 @@ import java.io.IOException;
 
 /**
  * A FileSink object writes the data sent to it to a file. If the file that
- * will we writen has a specific header, the header should be sent to the file
+ * will be written has a specific header, the header should be sent to the file
  * as "data". The FileSink object has no knowledge of headers of tags. It only
  * writes bytes of data to a file.
  * 
@@ -19,7 +20,7 @@ public class FileSink {
 	/* The file's handler */
 	private DataOutputStream _writer;
 	
-	/**
+	/**	
 	 * Create a new FileSink to write data to. The specified path must exist or
 	 * instanciation will be cancelled. If a file with the same name exists,
 	 * the file will be replaced without any warnings.
@@ -63,5 +64,3 @@ public class FileSink {
 		}
 	}
 }
-
-//test
