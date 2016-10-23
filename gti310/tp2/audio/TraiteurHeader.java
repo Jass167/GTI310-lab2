@@ -2,9 +2,10 @@ package gti310.tp2.audio;
 
 import java.nio.ByteBuffer;
 
-//cette clase va faire l'etude complet de le header entrant et l'update de le header sortant
-//les validations on va les faire sur la clase Convert44100HzTo8000HzAudioFIlter a travers de gets et sets
-//
+/**Cette classe fait l'étude complète du header d'un wave file entrant et update 
+ * le header du fichier wave résultant.
+ * Cette classe travaille en parallèle avec la classe 
+ * Convert44100HzTo8000HzAudioFIlter */
 public class TraiteurHeader {
 
 	private byte [] headerEnBrut;
