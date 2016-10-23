@@ -22,7 +22,7 @@ public class TraiteurHeader {
 	public TraiteurHeader(byte[] headerEnBrut) {
 		this.headerEnBrut = headerEnBrut;	
 
-		//Liste des methodes pour trouver toutes les données qu'on a besoin dans le header
+		//Liste des methodes pour trouver toutes les donnï¿½es qu'on a besoin dans le header
 		this.chunkSize = findChunkSize();
 		this.chunk2Size = findChunk2Size();
 		this.byteRate = findByteRate();
@@ -142,49 +142,105 @@ public class TraiteurHeader {
 	
 //-------------------------------------------------------------------------
 	
-	public void updateDuNewHeader(int newBitParSample, int newIsEstereo){
+	public byte[] updateDuNewHeader(int newBitParSample, int newIsEstereo, int newNumberOfSamples){
 		
-		newSetchunkSize();
-		newSetchunk2Size();
-		newSetbyteRate();
-		newSetbitParSample();
-		newSetsampleRate();
-
+		//7 changements en total pour new header 
+		//ATTENTION, l'ordre des methodes est important
+		newSetNumChannels(newIsEstereo);				//good	
+		newSetsampleRate();//fixe a 8000				//good
+		newSetbyteRate(newBitParSample,newIsEstereo);	//good
+		newSetBlockAlign(newBitParSample,newIsEstereo); //good
+		newSetbitParSample(newBitParSample);			//good
+		
+		newSetchunk2Size(newBitParSample,newIsEstereo,newNumberOfSamples);
+		newSetchunkSize(newBitParSample,newIsEstereo,newNumberOfSamples);
+		
+		return headerEnBrut;
 	}
+
+
+
+	private void newSetBlockAlign(int newBitParSample, int newIsEstereo) {
+	// TODO Auto-generated method stub
+		int resultat= newIsEstereo * (newBitParSample/8);
+		
+		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)resultat).array();
+        headerEnBrut[32]=newValue[1];
+        headerEnBrut[33]=newValue[0];
+	
+}
+
+
+
+	private void newSetNumChannels(int newIsEstereo) {
+	// TODO Auto-generated method stub
+		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newIsEstereo).array();
+        headerEnBrut[22]=newValue[1];
+        headerEnBrut[23]=newValue[0];
+	
+}
 
 
 
 	private void newSetsampleRate() {
 		// TODO Auto-generated method stub
+		byte[] newValue =  ByteBuffer.allocate(4).putInt(8000).array();
+        headerEnBrut[24]=newValue[3];
+        headerEnBrut[25]=newValue[2];
+        headerEnBrut[26]=newValue[1];
+        headerEnBrut[27]=newValue[0];
+	}
+
+
+
+	private void newSetbitParSample(int newBitParSample) {
+		// TODO Auto-generated method stub	
+		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newBitParSample).array();
+        headerEnBrut[34]=newValue[1];
+        headerEnBrut[35]=newValue[0];
+	}
+
+
+
+	private void newSetbyteRate(int newBitParSample, int newIsEstereo) {
+		// TODO Auto-generated method stub
+		
+		int resultat =sampleRate * newIsEstereo * (newBitParSample/8);
+		
+		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
+        headerEnBrut[28]=newValue[3];
+        headerEnBrut[29]=newValue[2];
+        headerEnBrut[30]=newValue[1];
+        headerEnBrut[31]=newValue[0];
+	}
+
+
+
+	private void newSetchunk2Size(int newBitParSample,int newIsEstereo,int newNumberOfSamples) {
+		// TODO Auto-generated method stub
+		
+		int resultat =newNumberOfSamples * newIsEstereo * (newBitParSample/8);
+		
+		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
+        headerEnBrut[40]=newValue[3];
+        headerEnBrut[41]=newValue[2];
+        headerEnBrut[42]=newValue[1];
+        headerEnBrut[43]=newValue[0];
 		
 	}
 
 
 
-	private void newSetbitParSample() {
+	private void newSetchunkSize(int newBitParSample,int newIsEstereo, int newNumberOfSamples) {
 		// TODO Auto-generated method stub
 		
-	}
-
-
-
-	private void newSetbyteRate() {
-		// TODO Auto-generated method stub
+		int resultat =36 +newNumberOfSamples * newIsEstereo * (newBitParSample/8);
 		
-	}
-
-
-
-	private void newSetchunk2Size() {
-		// TODO Auto-generated method stub
-		
-	}
-
-
-
-	private void newSetchunkSize() {
-		// TODO Auto-generated method stub
-		
+		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
+        headerEnBrut[4]=newValue[3];
+        headerEnBrut[5]=newValue[2];
+        headerEnBrut[6]=newValue[1];
+        headerEnBrut[7]=newValue[0];
 	}
 	
 }
