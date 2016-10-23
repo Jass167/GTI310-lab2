@@ -13,8 +13,9 @@ public class Application {
 	public static void main(String args[]) {
 		System.out.println("Audio Resample project!");
 		
-		//Starts the frequency convertion with the 2 paths
+		//Starts the frequency conversion with the 2 paths
 		AudioFilter filter = 
 				new Convert44100HzTo8000HzAudioFIlter(args[0],args[1]);
+		filter.process();
 	}
 }

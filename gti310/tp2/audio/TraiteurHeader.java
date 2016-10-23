@@ -9,41 +9,40 @@ public class TraiteurHeader {
 
 	private byte [] headerEnBrut;
 	private int checkWave;
-	//si estereo =2 si mono =1--on va considerer comme le nombres de canaux
-	private int isEstereo;
+	//si stereo =2 si mono =1--on va considerer comme le nombres de canaux
+	private int isStereo;
 	private int chunkSize;
 	private int chunk2Size;
 	private int byteRate;
 	private int bitParSample;
 	private int sampleRate;
 
-	// TODO Auto-generated constructor stub
+	//constructor
 	public TraiteurHeader(byte[] headerEnBrut) {
-		this.headerEnBrut= headerEnBrut;	
+		this.headerEnBrut = headerEnBrut;	
 
-		//Liste des methodes pour trouver toutes les donnes qu'on a besoin dans le header
-		this.chunkSize= findchunkSize();
-		this.chunk2Size= findchunk2Size();
-		this.byteRate= findbyteRate();
-		this.bitParSample= findbitParSample();
-		this.sampleRate= findsampleRate();
-		this.isEstereo= findIsEstereo();
-			
-		this.checkWave= findcheckWave();
+		//Liste des methodes pour trouver toutes les données qu'on a besoin dans le header
+		this.chunkSize = findChunkSize();
+		this.chunk2Size = findChunk2Size();
+		this.byteRate = findByteRate();
+		this.bitParSample = findBitParSample();
+		this.sampleRate = findSampleRate();
+		this.isStereo = findIsStereo();
+		this.checkWave = findCheckWave();
 	}
 
 	
 
-	//methode qui fait la somme des bytes a partir d'une position et un longuer sur le old header 
-	private int readTheBytesToInteger(int startByte, int longeur){
+	//methode qui fait la somme des bytes a partir d'une position et un longueur sur le old header 
+	private int readTheBytesToInteger(int startByte, int longueur){
 
-		byte[] sommeBytes = new byte[longeur];
+		byte[] sommeBytes = new byte[longueur];
 		int resultat=0;
 		//il faut ajouter les bytes de droite a gauche a cause de ENDIAN!!
 		//only flip little ENDIAN
 		int inverse = 1;
-		for(int i = startByte; i<startByte+longeur;i++){
-			sommeBytes[longeur-inverse]=headerEnBrut[i];
+		for(int i = startByte; i<startByte+longueur;i++){
+			sommeBytes[longueur-inverse]=headerEnBrut[i];
 			inverse ++;		
 		}
 
@@ -56,37 +55,37 @@ public class TraiteurHeader {
 		return resultat;
 	}
 	
-	private int findcheckWave() {
+	private int findCheckWave() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(8,4);
 	}
 
-	private int findIsEstereo() {
+	private int findIsStereo() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(22,2);
 	}
 
-	private int findchunk2Size() {
+	private int findChunk2Size() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(40,4);
 	}
 
-	private int findbitParSample() {
+	private int findBitParSample() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(34,2);
 	}
 
-	private int findsampleRate() {
+	private int findSampleRate() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(24,4);
 	}
 
-	private int findbyteRate() {
+	private int findByteRate() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(28,4);
 	}
 
-	private int findchunkSize() {
+	private int findChunkSize() {
 		// TODO Auto-generated method stub
 		return readTheBytesToInteger(4,4);
 	}
@@ -105,8 +104,8 @@ public class TraiteurHeader {
 
 
 
-	public int getIsEstereo() {
-		return isEstereo;
+	public int getIsStereo() {
+		return isStereo;
 	}
 
 
