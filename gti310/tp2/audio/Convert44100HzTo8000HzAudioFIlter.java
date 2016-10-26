@@ -46,8 +46,8 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 	public Convert44100HzTo8000HzAudioFIlter(String entryPath, 
 			String exitPath) 
 	{
-		this.entryPath =entryPath;
-		this.exitPath =exitPath;
+		this.entryPath = entryPath;
+		this.exitPath = exitPath;
 	}
 
 
@@ -180,6 +180,9 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 				System.out.println("Le fichier WAVE n'est pas valide, soit les BPS ou # de chanels  ");
 			}
 
+
+
+
 			/*
 			 * Création du nouveau fichier .wav avec le nouveau sample rate
 			 */
@@ -218,7 +221,7 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 
 
 		//Stock les nouveaux échantillons dans le tableau a retourner
-		byte[] convertedData = new byte[newNumberOfSamples];
+		byte[] convertedData = new byte[initialNumSamples];
 
 
 		//traiter quelle information on met dans convertedData selon 
@@ -261,7 +264,7 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 									(deltaY/deltaX));
 
 
-
+					
 					convertedData[i] = (byte) interpolationResult;
 				}
 
@@ -298,10 +301,12 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 
 
 		}
-
+		
 		return convertedData;
 	}
 }
+
+
 
 
 

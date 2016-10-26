@@ -15,8 +15,11 @@ public class Application {
 	 */
 	public static void main(String args[]) {
 		System.out.println("Audio Resample project!");
-		System.out.println(args[0].toString());
-	
+		System.out.println("argument 0 =" + args[0].toString());
+		
+		//"C:/Users/TEMP/Desktop/lol.wav"
+		//"C:/Users/TEMP/Desktop/loooooool.wav"
+		
 		//Starts the frequency conversion with the 2 paths
 		AudioFilter filter = 
 				new Convert44100HzTo8000HzAudioFIlter(args[0],args[1]);
