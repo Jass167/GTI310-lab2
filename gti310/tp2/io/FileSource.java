@@ -28,11 +28,11 @@ public class FileSource {
 	public FileSource(String location) throws FileNotFoundException {
 		try {
 			/* open the handler on the specified file */
-			_reader = new DataInputStream(
-						new BufferedInputStream(
-							new FileInputStream(location)));
+			System.out.println("locationn =  "+ location);
+			_reader = new DataInputStream(new BufferedInputStream(new FileInputStream(location)));
 		} catch (FileNotFoundException e) {
 			/* the path is not valid */
+			System.out.println("Sourcee not vaide");
 			throw e;
 		}
 	}
