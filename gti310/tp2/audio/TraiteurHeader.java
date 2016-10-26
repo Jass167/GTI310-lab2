@@ -57,37 +57,30 @@ public class TraiteurHeader {
 	}
 	
 	private int findCheckWave() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(8,4);
 	}
 
 	private int findIsStereo() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(22,2);
 	}
 
 	private int findChunk2Size() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(40,4);
 	}
 
 	private int findBitParSample() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(34,2);
 	}
 
 	private int findSampleRate() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(24,4);
 	}
 
 	private int findByteRate() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(28,4);
 	}
 
 	private int findChunkSize() {
-		// TODO Auto-generated method stub
 		return readTheBytesToInteger(4,4);
 	}
 
@@ -161,7 +154,7 @@ public class TraiteurHeader {
 
 
 	private void newSetBlockAlign(int newBitParSample, int newIsEstereo) {
-	// TODO Auto-generated method stub
+
 		int resultat= newIsEstereo * (newBitParSample/8);
 		
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)resultat).array();
@@ -173,7 +166,7 @@ public class TraiteurHeader {
 
 
 	private void newSetNumChannels(int newIsEstereo) {
-	// TODO Auto-generated method stub
+
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newIsEstereo).array();
         headerEnBrut[22]=newValue[1];
         headerEnBrut[23]=newValue[0];
@@ -183,7 +176,7 @@ public class TraiteurHeader {
 
 
 	private void newSetsampleRate() {
-		// TODO Auto-generated method stub
+
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(8000).array();
         headerEnBrut[24]=newValue[3];
         headerEnBrut[25]=newValue[2];
@@ -194,7 +187,7 @@ public class TraiteurHeader {
 
 
 	private void newSetbitParSample(int newBitParSample) {
-		// TODO Auto-generated method stub	
+
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newBitParSample).array();
         headerEnBrut[34]=newValue[1];
         headerEnBrut[35]=newValue[0];
@@ -203,7 +196,6 @@ public class TraiteurHeader {
 
 
 	private void newSetbyteRate(int newBitParSample, int newIsEstereo) {
-		// TODO Auto-generated method stub
 		
 		int resultat =sampleRate * newIsEstereo * (newBitParSample/8);
 		
@@ -216,10 +208,9 @@ public class TraiteurHeader {
 
 
 
-	private void newSetchunk2Size(int newBitParSample,int newIsEstereo,int newNumberOfSamples) {
-		// TODO Auto-generated method stub
+	private void newSetchunk2Size(int newBitParSample,int newIsStereo,int newNumberOfSamples) {
 		
-		int resultat =newNumberOfSamples * newIsEstereo * (newBitParSample/8);
+		int resultat =newNumberOfSamples * newIsStereo * (newBitParSample/8);
 		
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
         headerEnBrut[40]=newValue[3];
@@ -232,7 +223,6 @@ public class TraiteurHeader {
 
 
 	private void newSetchunkSize(int newBitParSample,int newIsEstereo, int newNumberOfSamples) {
-		// TODO Auto-generated method stub
 		
 		int resultat =36 +newNumberOfSamples * newIsEstereo * (newBitParSample/8);
 		
