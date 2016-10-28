@@ -13,7 +13,7 @@ public class TraiteurHeader {
 	//si stereo =2 si mono =1--on va considerer comme le nombres de canaux
 	private int isStereo;
 	private int chunkSize;
-	private int chunk2Size;
+	private int subchunk2Size;
 	private int byteRate;
 	private int bitParSample;
 	private int sampleRate;
@@ -24,7 +24,7 @@ public class TraiteurHeader {
 
 		//Liste des methodes pour trouver toutes les donn�es qu'on a besoin dans le header
 		this.chunkSize = findChunkSize();
-		this.chunk2Size = findChunk2Size();
+		this.subchunk2Size = findSubchunk2Size();
 		this.byteRate = findByteRate();
 		this.bitParSample = findBitParSample();
 		this.sampleRate = findSampleRate();
@@ -64,7 +64,7 @@ public class TraiteurHeader {
 		return readTheBytesToInteger(22,2);
 	}
 
-	private int findChunk2Size() {
+	private int findSubchunk2Size() {
 		return readTheBytesToInteger(40,4);
 	}
 
@@ -110,7 +110,7 @@ public class TraiteurHeader {
 
 
 	public int getChunk2Size() {
-		return chunk2Size;
+		return subchunk2Size;
 	}
 
 
@@ -137,6 +137,11 @@ public class TraiteurHeader {
 	
 	public byte[] updateDuNewHeader(int newBitParSample, int newIsEstereo, int newNumberOfSamples){
 		
+		System.out.println(newBitParSample);
+		System.out.println(newIsEstereo);
+		System.out.println(newNumberOfSamples);
+
+		
 		//7 changements en total pour new header 
 		//ATTENTION, l'ordre des methodes est important
 		newSetNumChannels(newIsEstereo);				//good	
@@ -145,8 +150,9 @@ public class TraiteurHeader {
 		newSetBlockAlign(newBitParSample,newIsEstereo); //good
 		newSetbitParSample(newBitParSample);			//good
 		
-		newSetchunk2Size(newBitParSample,newIsEstereo,newNumberOfSamples);
+		newSetSubchunk2Size(newBitParSample,newIsEstereo,newNumberOfSamples);
 		newSetchunkSize(newBitParSample,newIsEstereo,newNumberOfSamples);
+		
 		
 		return headerEnBrut;
 	}
@@ -182,8 +188,8 @@ public class TraiteurHeader {
         headerEnBrut[25]=newValue[2];
         headerEnBrut[26]=newValue[1];
         headerEnBrut[27]=newValue[0];
-	}
-
+ 
+}
 
 
 	private void newSetbitParSample(int newBitParSample) {
@@ -197,7 +203,7 @@ public class TraiteurHeader {
 
 	private void newSetbyteRate(int newBitParSample, int newIsEstereo) {
 		
-		int resultat =sampleRate * newIsEstereo * (newBitParSample/8);
+		int resultat = 8000 * newIsEstereo * (newBitParSample/8);
 		
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
         headerEnBrut[28]=newValue[3];
@@ -208,9 +214,9 @@ public class TraiteurHeader {
 
 
 
-	private void newSetchunk2Size(int newBitParSample,int newIsStereo,int newNumberOfSamples) {
+	private void newSetSubchunk2Size(int newBitParSample,int newIsStereo,int newNumberOfSamples) {
 		
-		int resultat =newNumberOfSamples * newIsStereo * (newBitParSample/8);
+		int resultat = newNumberOfSamples * newIsStereo * (newBitParSample/8);
 		
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
         headerEnBrut[40]=newValue[3];
@@ -220,11 +226,18 @@ public class TraiteurHeader {
 		
 	}
 
-
-
 	private void newSetchunkSize(int newBitParSample,int newIsEstereo, int newNumberOfSamples) {
 		
-		int resultat =36 +newNumberOfSamples * newIsEstereo * (newBitParSample/8);
+			/*ChunkSize:       36 + SubChunk2Size, or more precisely:
+                               4 + (8 + SubChunk1Size) + (8 + SubChunk2Size)
+                               This is the size of the rest of the chunk 
+                               following this number.  This is the size of the 
+                               entire file in bytes minus 8 bytes for the
+                               two fields not included in this count:
+                               ChunkID and ChunkSize.*/
+		int resultat = 36 + 
+				( newNumberOfSamples * newIsEstereo * (newBitParSample/8) );
+	
 		
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
         headerEnBrut[4]=newValue[3];
@@ -232,5 +245,4 @@ public class TraiteurHeader {
         headerEnBrut[6]=newValue[1];
         headerEnBrut[7]=newValue[0];
 	}
-	
 }
