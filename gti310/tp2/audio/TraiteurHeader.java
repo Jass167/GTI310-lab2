@@ -10,7 +10,8 @@ public class TraiteurHeader {
 
 	private byte [] headerEnBrut;
 	private int checkWave;
-	//si stereo =2 si mono =1--on va considerer comme le nombres de canaux
+	//si stereo =2 si mono =1--pas boolean car
+	//on veut considerer le nombre de canaux
 	private int isStereo;
 	private int chunkSize;
 	private int chunk2Size;
@@ -32,7 +33,7 @@ public class TraiteurHeader {
 		this.checkWave = findCheckWave();
 	}
 
-	
+
 
 	//methode qui fait la somme des bytes a partir d'une position et un longueur sur le old header 
 	private int readTheBytesToInteger(int startByte, int longueur){
@@ -42,25 +43,29 @@ public class TraiteurHeader {
 		//il faut ajouter les bytes de droite a gauche a cause de ENDIAN!!
 		//only flip little ENDIAN
 		int inverse = 1;
-		for(int i = startByte; i<startByte+longueur;i++){
+		for(int i = startByte; i<startByte+longueur;i++)
+		{
 			sommeBytes[longueur-inverse]=headerEnBrut[i];
 			inverse ++;		
 		}
 
-		if(sommeBytes.length==2){
+		if(sommeBytes.length == 2){
 			resultat= ByteBuffer.wrap(sommeBytes).getShort();
+
 		}
 		else if(sommeBytes.length == 4){
 			resultat=  ByteBuffer.wrap(sommeBytes).getInt();
 		}
 		return resultat;
 	}
-	
+
 	private int findCheckWave() {
 		return readTheBytesToInteger(8,4);
 	}
 
 	private int findIsStereo() {
+		//TODO
+		System.out.println("isStereoFunction: "+readTheBytesToInteger(22,2));
 		return readTheBytesToInteger(22,2);
 	}
 
@@ -124,19 +129,19 @@ public class TraiteurHeader {
 	public int getBitParSample() {
 		return bitParSample;
 	}
-	
+
 
 	public int getSampleRate() {
 		return sampleRate;
 	}
-//------------------------------------------------------------------------
-	
+	//------------------------------------------------------------------------
+
 	//On va mettre les updates pour le nouveau header a continuationn...
-	
-//-------------------------------------------------------------------------
-	
+
+	//-------------------------------------------------------------------------
+
 	public byte[] updateDuNewHeader(int newBitParSample, int newIsEstereo, int newNumberOfSamples){
-		
+
 		//7 changements en total pour new header 
 		//ATTENTION, l'ordre des methodes est important
 		newSetNumChannels(newIsEstereo);				//good	
@@ -144,10 +149,10 @@ public class TraiteurHeader {
 		newSetbyteRate(newBitParSample,newIsEstereo);	//good
 		newSetBlockAlign(newBitParSample,newIsEstereo); //good
 		newSetbitParSample(newBitParSample);			//good
-		
+
 		newSetchunk2Size(newBitParSample,newIsEstereo,newNumberOfSamples);
 		newSetchunkSize(newBitParSample,newIsEstereo,newNumberOfSamples);
-		
+
 		return headerEnBrut;
 	}
 
@@ -156,32 +161,32 @@ public class TraiteurHeader {
 	private void newSetBlockAlign(int newBitParSample, int newIsEstereo) {
 
 		int resultat= newIsEstereo * (newBitParSample/8);
-		
+
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)resultat).array();
-        headerEnBrut[32]=newValue[1];
-        headerEnBrut[33]=newValue[0];
-	
-}
+		headerEnBrut[32]=newValue[1];
+		headerEnBrut[33]=newValue[0];
+
+	}
 
 
 
 	private void newSetNumChannels(int newIsEstereo) {
 
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newIsEstereo).array();
-        headerEnBrut[22]=newValue[1];
-        headerEnBrut[23]=newValue[0];
-	
-}
+		headerEnBrut[22]=newValue[1];
+		headerEnBrut[23]=newValue[0];
+
+	}
 
 
 
 	private void newSetsampleRate() {
 
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(8000).array();
-        headerEnBrut[24]=newValue[3];
-        headerEnBrut[25]=newValue[2];
-        headerEnBrut[26]=newValue[1];
-        headerEnBrut[27]=newValue[0];
+		headerEnBrut[24]=newValue[3];
+		headerEnBrut[25]=newValue[2];
+		headerEnBrut[26]=newValue[1];
+		headerEnBrut[27]=newValue[0];
 	}
 
 
@@ -189,48 +194,48 @@ public class TraiteurHeader {
 	private void newSetbitParSample(int newBitParSample) {
 
 		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newBitParSample).array();
-        headerEnBrut[34]=newValue[1];
-        headerEnBrut[35]=newValue[0];
+		headerEnBrut[34]=newValue[1];
+		headerEnBrut[35]=newValue[0];
 	}
 
 
 
 	private void newSetbyteRate(int newBitParSample, int newIsEstereo) {
-		
+
 		int resultat =sampleRate * newIsEstereo * (newBitParSample/8);
-		
+
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
-        headerEnBrut[28]=newValue[3];
-        headerEnBrut[29]=newValue[2];
-        headerEnBrut[30]=newValue[1];
-        headerEnBrut[31]=newValue[0];
+		headerEnBrut[28]=newValue[3];
+		headerEnBrut[29]=newValue[2];
+		headerEnBrut[30]=newValue[1];
+		headerEnBrut[31]=newValue[0];
 	}
 
 
 
 	private void newSetchunk2Size(int newBitParSample,int newIsStereo,int newNumberOfSamples) {
-		
+
 		int resultat =newNumberOfSamples * newIsStereo * (newBitParSample/8);
-		
+
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
-        headerEnBrut[40]=newValue[3];
-        headerEnBrut[41]=newValue[2];
-        headerEnBrut[42]=newValue[1];
-        headerEnBrut[43]=newValue[0];
-		
+		headerEnBrut[40]=newValue[3];
+		headerEnBrut[41]=newValue[2];
+		headerEnBrut[42]=newValue[1];
+		headerEnBrut[43]=newValue[0];
+
 	}
 
 
 
 	private void newSetchunkSize(int newBitParSample,int newIsEstereo, int newNumberOfSamples) {
-		
+
 		int resultat =36 +newNumberOfSamples * newIsEstereo * (newBitParSample/8);
-		
+
 		byte[] newValue =  ByteBuffer.allocate(4).putInt(resultat).array();
-        headerEnBrut[4]=newValue[3];
-        headerEnBrut[5]=newValue[2];
-        headerEnBrut[6]=newValue[1];
-        headerEnBrut[7]=newValue[0];
+		headerEnBrut[4]=newValue[3];
+		headerEnBrut[5]=newValue[2];
+		headerEnBrut[6]=newValue[1];
+		headerEnBrut[7]=newValue[0];
 	}
-	
+
 }

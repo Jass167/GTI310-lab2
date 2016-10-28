@@ -19,7 +19,7 @@ public class FileSource {
 	private DataInputStream _reader;
 
 	/**
-	 * Create a new FileSource. The instanciation will be cancelled if the
+	 * Create a new FileSource. The instantiation will be cancelled if the
 	 * specified path is not valid.
 	 * 
 	 * @param location The complete path to the file
@@ -28,11 +28,10 @@ public class FileSource {
 	public FileSource(String location) throws FileNotFoundException {
 		try {
 			/* open the handler on the specified file */
-			System.out.println("locationn =  "+ location);
 			_reader = new DataInputStream(new BufferedInputStream(new FileInputStream(location)));
 		} catch (FileNotFoundException e) {
 			/* the path is not valid */
-			System.out.println("Sourcee not vaide");
+			System.out.println("Source not valid");
 			throw e;
 		}
 	}
