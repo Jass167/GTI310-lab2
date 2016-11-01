@@ -22,7 +22,8 @@ public class TraiteurHeader {
 	public TraiteurHeader(byte[] headerEnBrut) {
 		this.headerEnBrut = headerEnBrut;	
 
-		//Liste des methodes pour trouver toutes les donn�es qu'on a besoin dans le header
+		//Liste des methodes pour trouver toutes les donn�es qu'on a
+		//besoin dans le header
 		this.chunkSize = findChunkSize();
 		this.subchunk2Size = findSubchunk2Size();
 		this.byteRate = findByteRate();
@@ -34,7 +35,8 @@ public class TraiteurHeader {
 
 	
 
-	//methode qui fait la somme des bytes a partir d'une position et un longueur sur le old header 
+	//methode qui fait la somme des bytes a partir d'une position et une
+	//longueur sur le old header 
 	private int readTheBytesToInteger(int startByte, int longueur){
 
 		byte[] sommeBytes = new byte[longueur];
@@ -135,13 +137,9 @@ public class TraiteurHeader {
 	
 //-------------------------------------------------------------------------
 	
-	public byte[] updateDuNewHeader(int newBitParSample, int newIsEstereo, int newNumberOfSamples){
-		
-		System.out.println(newBitParSample);
-		System.out.println(newIsEstereo);
-		System.out.println(newNumberOfSamples);
-
-		
+	public byte[] updateDuNewHeader(int newBitParSample, int newIsEstereo, 
+			int newNumberOfSamples){
+				
 		//7 changements en total pour new header 
 		//ATTENTION, l'ordre des methodes est important
 		newSetNumChannels(newIsEstereo);				//good	
@@ -163,7 +161,8 @@ public class TraiteurHeader {
 
 		int resultat= newIsEstereo * (newBitParSample/8);
 		
-		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)resultat).array();
+		byte[] newValue =  
+				ByteBuffer.allocate(2).putShort((short)resultat).array();
         headerEnBrut[32]=newValue[1];
         headerEnBrut[33]=newValue[0];
 	
@@ -173,7 +172,8 @@ public class TraiteurHeader {
 
 	private void newSetNumChannels(int newIsEstereo) {
 
-		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newIsEstereo).array();
+		byte[] newValue =  
+				ByteBuffer.allocate(2).putShort((short)newIsEstereo).array();
         headerEnBrut[22]=newValue[1];
         headerEnBrut[23]=newValue[0];
 	
@@ -194,7 +194,8 @@ public class TraiteurHeader {
 
 	private void newSetbitParSample(int newBitParSample) {
 
-		byte[] newValue =  ByteBuffer.allocate(2).putShort((short)newBitParSample).array();
+		byte[] newValue =  
+				ByteBuffer.allocate(2).putShort((short)newBitParSample).array();
         headerEnBrut[34]=newValue[1];
         headerEnBrut[35]=newValue[0];
 	}
@@ -214,7 +215,8 @@ public class TraiteurHeader {
 
 
 
-	private void newSetSubchunk2Size(int newBitParSample,int newIsStereo,int newNumberOfSamples) {
+	private void newSetSubchunk2Size(int newBitParSample,int newIsStereo,
+			int newNumberOfSamples) {
 		
 		int resultat = newNumberOfSamples * newIsStereo * (newBitParSample/8);
 		
@@ -226,7 +228,8 @@ public class TraiteurHeader {
 		
 	}
 
-	private void newSetchunkSize(int newBitParSample,int newIsEstereo, int newNumberOfSamples) {
+	private void newSetchunkSize(int newBitParSample,int newIsEstereo, 
+			int newNumberOfSamples) {
 		
 			/*ChunkSize:       36 + SubChunk2Size, or more precisely:
                                4 + (8 + SubChunk1Size) + (8 + SubChunk2Size)
