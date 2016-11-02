@@ -7,6 +7,7 @@ import java.nio.ByteOrder;
 
 
 import gti310.tp2.io.FileSink;
+
 import gti310.tp2.io.FileSource;
 
 
@@ -38,8 +39,8 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 	donc on a change en decimal
 	 */
 	private static final int WAVEHEADER = 1163280727;
-	private static final int INITIALSAMPLERATE = 44100;	
-	private static final int NEWSAMPLERATE = 8000;
+	private static final double INITIALSAMPLERATE = 44100;	
+	private static final double NEWSAMPLERATE = 8000;
 
 
 	//Constructor
@@ -103,11 +104,11 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
             of the read of the subchunk following this 
             number.
 			 */
-			initialNumSamples = traiteurHeader.getChunk2Size()/(traiteurHeader.getIsStereo()*(traiteurHeader.getBitParSample()/8));
-
-
-
-
+			initialNumSamples = traiteurHeader.getChunk2Size()/
+					(traiteurHeader.getIsStereo()*
+							(traiteurHeader.getBitParSample()/8));
+			
+			
 			/*Trouver le nombre d'échantillons prélevés qui reconstruiront le .wav
 		    Ce nombre correspond a la fraction entre les frequences 
 		    dechantillonage. Exemple : a chaque 44100 echantillons, on veut en
@@ -115,6 +116,7 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 		    initial x 8000/44100 */
 			newNumberOfSamples = (int)(( NEWSAMPLERATE / INITIALSAMPLERATE )* initialNumSamples);
 
+		
 
 			//pop le reste des données du file source avec le initialSubchunk2Size
 			initialAudioData = fileSource.pop(traiteurHeader.getChunk2Size());
@@ -123,63 +125,29 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 			//8bits or 16bits ET stereo or mono
 			//Donc 4 scenarios possibles 
 
-
-
-
-			if((traiteurHeader.getBitParSample()==8 || traiteurHeader.getBitParSample()==16) &&
-					(traiteurHeader.getIsStereo()==1 || traiteurHeader.getIsStereo()==2)){	
+			if((traiteurHeader.getBitParSample()==8 ||
+					traiteurHeader.getBitParSample()==16) &&
+					(traiteurHeader.getIsStereo()==1 || 
+					traiteurHeader.getIsStereo()==2)){	
 				//on va convertir les données en consequence 
-				newData=dataRateConverter(initialAudioData,initialNumSamples,traiteurHeader.getBitParSample(),traiteurHeader.getIsStereo());
+				newData = dataRateConverter(initialAudioData,
+						initialNumSamples,traiteurHeader.getBitParSample(),
+						traiteurHeader.getIsStereo());
 
 
 				//on update le nouveau header en consequence 
-				newHeader= traiteurHeader.updateDuNewHeader(traiteurHeader.getBitParSample(),traiteurHeader.getIsStereo(),newNumberOfSamples);
+				newHeader= 
+						traiteurHeader.updateDuNewHeader(traiteurHeader.getBitParSample(),
+								traiteurHeader.getIsStereo(),newNumberOfSamples);
 			}
-			/*	
-			//8bits et stereo
-			else if(traiteurHeader.getBitParSample()==8 && traiteurHeader.getIsStereo()==2){
 
 
-				newData= dataRateConverter(initialAudioData, initialNumSamples,8,2);
-
-
-				//on update le nouveau header en consequence 
-				newHeader =traiteurHeader.updateDuNewHeader(8,2,newNumberOfSamples);
-
-
-			}
-			//16bits et mono
-			else if(traiteurHeader.getBitParSample()==16 && traiteurHeader.getIsStereo()==1){
-
-
-
-
-				newData=dataRateConverter(initialAudioData,initialNumSamples,16,1);
-
-
-				//on update le nouveau header en consequence 
-				newHeader =traiteurHeader.updateDuNewHeader(16,1,newNumberOfSamples);
-
-
-			}
-			//16bits et stereo
-			else if(traiteurHeader.getBitParSample()==16 && traiteurHeader.getIsStereo()==2){
-
-
-				newData=dataRateConverter(initialAudioData,initialNumSamples,16,2);
-
-
-				//on update le nouveau header en consequence 
-				newHeader= traiteurHeader.updateDuNewHeader(16,1,newNumberOfSamples);
-
-
-			}*/
 			//Gérer si le .wav n'est pas 8 ou 16 BPS ou mono/stereo
 			else
 			{
-				System.out.println("Le fichier WAVE n'est pas valide, soit les BPS ou # de chanels  ");
+				System.out.println("Le fichier WAVE n'est pas valide, "
+						+ "soit les BPS ou # de chanels  ");
 			}
-
 
 
 
@@ -196,9 +164,9 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 				fileSink.push(newData);	
 
 
-				System.out.println("La conversion du WAVE de "+
-						traiteurHeader.getIsStereo()+" channels et "+
-						traiteurHeader.getBitParSample()+" bits a reussi!! ");
+				System.out.println("Done : La conversion du WAVE initial de "+
+						traiteurHeader.getIsStereo()+" channel(s) et "+
+						traiteurHeader.getBitParSample()+" bits est reussie!! ");
 
 
 				fileSource.close();			
@@ -216,82 +184,149 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 	 *Méthode qui converti le data rate d'un sample
 	 *Pour le lab, on converti de 44,1kHz a 8kHz
 	 */
-	private byte[] dataRateConverter(byte[] initialAudioData,int initialNumSamples,int bitParSample, int isStereo)
+	private byte[] dataRateConverter(byte[] initialAudioData,
+			int initialNumSamples,int bitParSample, int isStereo)
 	{
-
-
-		//Stock les nouveaux échantillons dans le tableau a retourner
-		byte[] convertedData = new byte[initialNumSamples];
-
-
 		//traiter quelle information on met dans convertedData selon 
 		//les 4 scenarios
 
-
+		//Stock les nouveaux échantillons dans le tableau a retourner
+		byte[] convertedData = null;
+		
 		//mono 8 bits 
 		if(isStereo == 1 && bitParSample == 8)
 		{
-			for( int i = 0 ; i <= newNumberOfSamples ; i++)
+			//Stock les nouveaux échantillons dans le tableau a retourner
+			convertedData = new byte[newNumberOfSamples];
+			
+			
+			for( int i = 0 ; i < newNumberOfSamples ; i++)
 			{
 				/* L'index est multiplié par le facteur de conversion
 				 * pour savoir quelles valeurs de initialAudioData 
 				 * nous allons utiliser pour la conversion
 				 **/
-				double interpolationIndexValue = i * ( INITIALSAMPLERATE / NEWSAMPLERATE );
-
-
+				double interpolationIndexValue = i * 
+						( INITIALSAMPLERATE / NEWSAMPLERATE );
 
 
 				//les index d'un tableau doivent etre des int mais on a besoin 
 				//de prendre les décimales en compte pour l'interpolation
+
+				//si lindex contient des decimale, on interpole
 				if (interpolationIndexValue%1 != 0)
 				{
 					//interpolation
 
-
-					//convertedData[i] = 
 					int deltaY =  
-							initialAudioData[(int)interpolationIndexValue+1]
+							initialAudioData[((int)interpolationIndexValue)+1]
 									- initialAudioData[(int)interpolationIndexValue];
 					//égal toujours 1 car on prend 2 valeurs collées dans le tableau de bytes
 					int deltaX = 1;
 
 
+
 					//variable temporaire contenant le data en int qui sera
 					//transformé en byte
-					int interpolationResult = (int) initialAudioData[(int)interpolationIndexValue]
-							+ (int)((interpolationIndexValue - (int)interpolationIndexValue)* 
-									(deltaY/deltaX));
-
-
+					int interpolationResult = 
+							(int) ( initialAudioData[(int)interpolationIndexValue]);
+						
+					/**Avec l'interpolation linéaire, on ajoutait ces données
+					 * à interpolationResult pour calculer nos valeurs,
+					 * seulement, le résultat obtenu avait plein de bruits
+					 * indésirables et c'est pourquoi nous avons 'skip' 
+					 * l'interpolation:
+					+  (deltaY/deltaX)*(interpolationIndexValue - 			
+					(int) interpolationIndexValue) ); */
 					
 					convertedData[i] = (byte) interpolationResult;
 				}
 
-
+				//if the interpolationIndexValue is a round number without
+				//decimals, no interpolation needed.
 				else if (interpolationIndexValue%1 == 0)
 				{
-					convertedData[i] = initialAudioData[(int)interpolationIndexValue];
-				}
-
-
-				else
-				{
-					System.out.println("Invalid sampling rates, "
-							+ "check if a sampling value is negative");
+					convertedData[i] =
+							initialAudioData[(int)interpolationIndexValue];
 				}
 			}
 		}
 
 
 		//mono 16 bits
-		if(isStereo == 1 && bitParSample == 8)
-		{}
+		if(isStereo == 1 && bitParSample == 16)
+		{
+			//Stock les nouveaux échantillons dans le tableau a retourner
+			convertedData = new byte[newNumberOfSamples*2];	//2 bytes par sample
+			
+			//utilisé pour update convertedData(on prend 2 echantillons par boucle)
+			//on doit utiliser un index différent de i car l'index de convertedData
+			//augmente de 2 positions par itération.
+			int j = 0;
+			
+			for( int i = 0 ; i < newNumberOfSamples ; i++ )
+			{
+					
+				/* L'index est multiplié par le facteur de conversion
+				 * pour savoir quelles valeurs de initialAudioData 
+				 * nous allons utiliser pour la conversion
+				 **/
+				double interpolationIndexValue = i * 
+						( INITIALSAMPLERATE / NEWSAMPLERATE );
+
+				//si lindex contient des decimale, on interpole
+				if (interpolationIndexValue%1 != 0)
+				{
+					int deltaY = ( initialAudioData[((int)interpolationIndexValue)*2+3]<<8
+							+ initialAudioData[((int)interpolationIndexValue)*2+2] )
+							- ( initialAudioData[((int)interpolationIndexValue)*2+1]<<8
+									+ initialAudioData[((int)interpolationIndexValue)*2] );
+
+					//égal toujours 1 car on prend 2 échantillons collées dans
+					//le tableau de bytes
+					int deltaX = 1;
+
+					double yA = ( initialAudioData[(int)interpolationIndexValue+1]<<8
+							+ initialAudioData[(int)interpolationIndexValue] );
+
+					//interpolation
+					int interpolationResult = 
+							(int)( yA + (deltaY/deltaX)
+							* ( (interpolationIndexValue) - 
+									(interpolationIndexValue)%1 ));
+									
+
+
+					byte[] interpolationBuffer = 
+							ByteBuffer.allocate(2).order(ByteOrder.LITTLE_ENDIAN).putShort((short)interpolationResult).array();
+
+					convertedData[j] = (byte) interpolationBuffer[0];
+
+					convertedData[j+1] = (byte) interpolationBuffer[1];
+
+
+				}
+				//if the interpolationIndexValue is a round number without
+				//decimals, no interpolation needed.
+				else if (interpolationIndexValue%1 == 0)
+				{					
+					convertedData[j] = (initialAudioData[((int)interpolationIndexValue)*2]);
+					convertedData[j+1] = (initialAudioData[((int)interpolationIndexValue)*2+1]);
+					
+				}
+				
+				//ayant 2 nouvelles valeurs dans convertedData, on augmente l'
+				//index de 2
+				j+=2;
+			}
+		}
 
 
 		//stereo 8 bits
-		if(isStereo == 2 && bitParSample == 16)
-		{}
+		if(isStereo == 2 && bitParSample == 8)
+		{
+			
+		}
 
 
 		//stereo 16 bits
@@ -301,13 +336,7 @@ public class Convert44100HzTo8000HzAudioFIlter implements AudioFilter
 
 
 		}
-		
+
 		return convertedData;
 	}
 }
-
-
-
-
-
-

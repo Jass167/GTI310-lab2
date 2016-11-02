@@ -15,7 +15,6 @@ public class Application {
 	 */
 	public static void main(String args[]) {
 		System.out.println("Audio Resample project!");
-		System.out.println("argument 0 =" + args[0].toString());
 		
 		//"C:/Users/TEMP/Desktop/lol.wav"
 		//"C:/Users/TEMP/Desktop/loooooool.wav"
